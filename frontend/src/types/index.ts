@@ -64,7 +64,7 @@ export interface MatchDetail {
 export interface Bet {
   id: number;
   match_id: number;
-  bet_type: 'win' | 'draw' | 'loss' | 'over' | 'under' | 'handicap';
+  bet_type: 'win' | 'draw' | 'loss' | 'over' | 'under' | 'handicap' | 'correct_score';
   pick: string;
   odds: number;
   stake: number;

@@ -20,6 +20,7 @@ class BetType(str, enum.Enum):
     OVER = "over"
     UNDER = "under"
     HANDICAP = "handicap"
+    CORRECT_SCORE = "correct_score"
 
 
 class BetResult(str, enum.Enum):
