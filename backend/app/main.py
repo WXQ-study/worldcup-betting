@@ -1,8 +1,8 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import engine, Base
-from .routers import bets, matches, teams, predictions
+from .routers import bets, matches, teams, predictions, auth
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,6 +24,7 @@ app.include_router(bets.router)
 app.include_router(matches.router)
 app.include_router(teams.router)
 app.include_router(predictions.router)
+app.include_router(auth.router)
 
 
 @app.get("/")

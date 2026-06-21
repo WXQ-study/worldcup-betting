@@ -1,12 +1,27 @@
-import type { Team, Match, Bet, Stats, Bankroll, Prediction, BetCreate, BetUpdate, MatchDetail } from '../types';
+﻿import type { Team, Match, Bet, Stats, Bankroll, Prediction, BetCreate, BetUpdate, MatchDetail, Odds } from '../types';
 
 const BASE = '/api';
 
+function getToken(): string | null {
+  return localStorage.getItem('token');
+}
+
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
+  const token = getToken();
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   const res = await fetch(`${BASE}${url}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     ...options,
   });
+  if (res.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+    throw new Error('Unauthorized');
+  }
   if (!res.ok) {
     const err = await res.text();
     throw new Error(err || res.statusText);
@@ -29,6 +44,8 @@ export const api = {
   getMatch: (id: number) => request<Match>(`/matches/${id}`),
 
   getMatchDetail: (id: number) => request<MatchDetail>(`/matches/${id}/detail`),
+
+  getMatchOdds: (id: number) => request<Odds[]>(`/matches/${id}/odds`),
 
   getBets: (params?: { status?: string }) => {
     const qs = new URLSearchParams();

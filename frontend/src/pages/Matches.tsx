@@ -203,17 +203,23 @@ export default function Matches() {
                   >
                     <div style={{
                       width: 40, height: 40, borderRadius: 8,
-                      background: getGroupColor(m.group || 'A') + '18',
+                      background: m.status === 'finished' ? '#f6ffed' : m.status === 'live' ? '#fff2f0' : getGroupColor(m.group || 'A') + '18',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 14, fontWeight: 700, color: getGroupColor(m.group || 'A'),
+                      fontSize: 14, fontWeight: 700, color: m.status === 'finished' ? '#52c41a' : m.status === 'live' ? '#ff4d4f' : getGroupColor(m.group || 'A'),
                       flexShrink: 0,
                     }}>
-                      {m.group}组
+                      {m.status === 'finished' ? '完' : m.status === 'live' ? '赛' : m.group + '组'}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 500 }}>
                         <span>{m.home_team.name_cn}</span>
-                        <span style={{ color: '#bbb', margin: '0 8px' }}>vs</span>
+                        {m.status === 'finished' || m.status === 'live' ? (
+  <span style={{ color: m.status === 'live' ? '#ff4d4f' : '#333', fontWeight: 700, fontSize: 16, margin: '0 8px' }}>
+    {m.home_score}:{m.away_score}
+  </span>
+) : (
+  <span style={{ color: '#bbb', margin: '0 8px' }}>vs</span>
+)}
                         <span>{m.away_team.name_cn}</span>
                       </div>
                       <div style={{ fontSize: 12, color: '#999', marginTop: 2 }}>

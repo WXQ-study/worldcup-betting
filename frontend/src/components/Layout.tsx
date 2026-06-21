@@ -1,8 +1,16 @@
-import { useState } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+﻿import { useState } from 'react';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
@@ -26,10 +34,23 @@ export default function Layout() {
           {!collapsed && <h1 style={{ fontSize: 16, margin: 0, whiteSpace: 'nowrap' }}>加美墨世界杯</h1>}
         </div>
 
+        {/* User Info */}
+        {!collapsed && user && (
+          <div style={{
+            padding: '12px 16px',
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            fontSize: 12,
+            color: 'rgba(255,255,255,0.65)',
+          }}>
+            <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>👤 {user.username}</div>
+            <div style={{ marginTop: 2 }}>{user.email}</div>
+          </div>
+        )}
+
         <nav style={{ padding: '12px 8px', flex: 1 }}>
           {[
             { to: '/', label: '📊', text: '仪表盘' },
-            { to: '/predictions', label: '🤖', text: '智能推荐' },
+            { to: '/predictions', label: '🧻', text: '智能推荐' },
             { to: '/matches', label: '🏟️', text: '所有比赛' },
             { to: '/bets', label: '📝', text: '投注记录' },
           ].map((item) => (
@@ -56,6 +77,28 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+
+        {/* Logout */}
+        {!collapsed && (
+          <button
+            onClick={handleLogout}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'rgba(255,255,255,0.5)',
+              cursor: 'pointer',
+              padding: '12px 16px',
+              borderTop: '1px solid rgba(255,255,255,0.1)',
+              fontSize: 13,
+              textAlign: 'left',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            🚪 退出登录
+          </button>
+        )}
 
         <button
           onClick={() => setCollapsed(!collapsed)}

@@ -1,9 +1,16 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum as SQLEnum, Date
+﻿from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
+import os
 
 from .database import Base
+
+
+# JWT 配置
+SECRET_KEY = os.getenv("JWT_SECRET", "dev-secret-change-in-production")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 小时
 
 
 class MatchStatus(str, enum.Enum):
@@ -37,6 +44,19 @@ class PlayerPosition(str, enum.Enum):
     DEF = "DEF"
     MID = "MID"
     FWD = "FWD"
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(100), unique=True, nullable=False)
+    hashed_password = Column(String(200), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    bets = relationship("Bet", back_populates="user")
+    bankroll = relationship("Bankroll", back_populates="user", uselist=False)
 
 
 class Team(Base):
@@ -113,6 +133,7 @@ class Bet(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     match_id = Column(Integer, ForeignKey("matches.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     bet_type = Column(SQLEnum(BetType), nullable=False)
     pick = Column(String(50), nullable=False)
     odds = Column(Float, nullable=False)
@@ -124,12 +145,16 @@ class Bet(Base):
     settled_at = Column(DateTime, nullable=True)
 
     match = relationship("Match", back_populates="bets")
+    user = relationship("User", back_populates="bets")
 
 
 class Bankroll(Base):
     __tablename__ = "bankroll"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
     initial_balance = Column(Float, nullable=False, default=10000.00)
     current_balance = Column(Float, nullable=False, default=10000.00)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = relationship("User", back_populates="bankroll")

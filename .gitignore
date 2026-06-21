@@ -1,15 +1,22 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
 venv/
 .env
-*.db
 
 # Node
 node_modules/
 dist/
 .vite/
+
+# Mobile
+mobile/node_modules/
+mobile/dist/
+mobile/.expo/
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/build/
 
 # IDE
 .idea/
@@ -24,3 +31,10 @@ Thumbs.db
 # Environment
 backend/.env
 frontend/.env
+
+# Database (keep directory, ignore files)
+backend/data/*.db
+mobile/data/*.db
+
+# Temporary files
+*.tmp

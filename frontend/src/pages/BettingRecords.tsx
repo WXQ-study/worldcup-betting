@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+﻿import { useEffect, useState, useCallback, useMemo } from 'react';
 import { api } from '../api';
 import type { Bet, Match } from '../types';
 import MatchDetailModal from '../components/MatchDetailModal';
@@ -57,7 +57,7 @@ export default function BettingRecords() {
 
   const loadMatchOdds = useCallback(async (matchId: number) => {
     try {
-      const oddsList = await fetch(`/api/matches/${matchId}/odds`).then(r => r.json());
+      const oddsList = await api.getMatchOdds(matchId);
       if (oddsList && oddsList.length > 0) {
         setSelectedMatchOdds({
           home: oddsList[0].home_odds,
@@ -110,20 +110,27 @@ export default function BettingRecords() {
     });
   }, [bets]);
 
+  const [error, setError] = useState('');
+
   const handleCreate = async () => {
     if (!form.match_id || !form.odds || !form.stake || !form.pick) return;
-    await api.createBet({
-      match_id: form.match_id,
-      bet_type: form.bet_type,
-      pick: form.pick,
-      odds: form.odds,
-      stake: form.stake,
-      notes: form.notes || undefined,
-    });
-    setShowForm(false);
-    setForm({ match_id: 0, bet_type: 'win', pick: '', odds: 0, stake: 100, notes: '', tab: 'wdl' });
-    setSelectedMatchOdds(null);
-    loadData();
+    setError('');
+    try {
+      await api.createBet({
+        match_id: form.match_id,
+        bet_type: form.bet_type,
+        pick: form.pick,
+        odds: form.odds,
+        stake: form.stake,
+        notes: form.notes || undefined,
+      });
+      setShowForm(false);
+      setForm({ match_id: 0, bet_type: 'win', pick: '', odds: 0, stake: 100, notes: '', tab: 'wdl' });
+      setSelectedMatchOdds(null);
+      loadData();
+    } catch (err: any) {
+      setError(err.message || '创建投注失败');
+    }
   };
 
   const handleSettle = async (id: number, result: string, profit: number) => {
@@ -320,8 +327,9 @@ export default function BettingRecords() {
               style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d9d9d9', fontSize: 14 }} />
           </div>
 
+          {error && <div style={{color:"#ff4d4f",fontSize:13,marginBottom:8,textAlign:"right"}}>{error}</div>}
           <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
-            <button onClick={handleCreate} disabled={!form.pick || !form.odds || form.odds <= 0}
+            <button onClick={handleCreate} disabled={!form.match_id || !form.pick || !form.odds || form.odds <= 0 || !form.stake}
               style={{
                 padding: '10px 32px', borderRadius: 8, border: 'none',
                 background: form.pick && form.odds > 0 ? 'linear-gradient(135deg, #1677ff, #4096ff)' : '#d9d9d9',

@@ -128,12 +128,34 @@ export interface BetUpdate {
   profit_loss?: number;
 }
 
-export interface Odds {
+// ========== Auth Types ==========
+
+export interface User {
   id: number;
-  match_id: number;
-  bookmaker: string;
-  home_odds: number;
-  draw_odds: number;
-  away_odds: number;
-  timestamp: string;
+  username: string;
+  email: string;
+  created_at: string;
+}
+
+export interface UserRegister {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface UserLogin {
+  username: string;
+  password: string;
+}
+
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
+  user: User;
+}
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isLoading: boolean;
 }
